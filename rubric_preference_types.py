@@ -44,9 +44,9 @@ class LabeledPrometheusEvalComparison:
 class PrometheusEvalPreferenceModel:
     async def __call__(self, comparison: PrometheusEvalComparison) -> float:
         """
-        1: A is strongly preferred
+        -1: A is strongly preferred
         0: Tie
-        -1: B is strongly preferred
+        1: B is strongly preferred
 
         Caveat: Prometheus-eval training data do not include examples that are tied.
         """
