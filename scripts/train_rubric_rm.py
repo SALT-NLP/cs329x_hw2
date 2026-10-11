@@ -1,10 +1,13 @@
+import asyncio
+
 from dotenv import load_dotenv
 from typing import cast
 
 import chz
 from datasets import Dataset, load_dataset
 from tinker import types
-from tinker_cookbook import cli_utils, model_info
+from tinker_cookbook import cli_utils
+from inkling_renderer import get_renderer_name
 from rubric_preference_types import (
     LabeledPrometheusEvalComparison,
     PrometheusEvalComparison,
@@ -14,7 +17,7 @@ from rubric_preference_types import (
 from tinker_cookbook.renderers import TrainOnWhat
 from tinker_cookbook.supervised import train
 from tinker_cookbook.supervised.data import SupervisedDatasetFromHFDataset
-from tinker_cookbook.supervised.common import datum_from_tokens_weights
+from tinker_cookbook.supervised.common import datum_from_model_input_weights
 from tinker_cookbook.supervised.types import ChatDatasetBuilder, ChatDatasetBuilderCommonConfig
 
 
@@ -33,8 +36,8 @@ class PrometheusV2PreferenceDataBuilder(ChatDatasetBuilder):
         train_ds = dataset.skip(1024)
 
         def comparison_to_datum(labeled_comparison: LabeledPrometheusEvalComparison) -> types.Datum:
-            tokens, weights = self.comparison_renderer.to_tokens_weights(labeled_comparison)
-            return datum_from_tokens_weights(tokens, weights, self.common_config.max_length)
+            model_input, weights = self.comparison_renderer.to_tokens_weights(labeled_comparison)
+            return datum_from_model_input_weights(model_input, weights, self.common_config.max_length)
 
         def example_to_data(example: dict[str, str]) -> list[types.Datum]:
             labeled_comparison = LabeledPrometheusEvalComparison(
@@ -70,7 +73,7 @@ def build_config(
     wandb_project: str | None = None,
     wandb_name: str | None = None,
 ) -> train.Config:
-    renderer_name = model_info.get_recommended_renderer_name(model_name)
+    renderer_name = get_renderer_name(model_name)  # disables thinking for Inkling
     common_config = ChatDatasetBuilderCommonConfig(
         model_name_for_tokenizer=model_name,
         renderer_name=renderer_name,
@@ -82,6 +85,7 @@ def build_config(
     return train.Config(
         log_path=log_path,
         model_name=model_name,
+        recipe_name="cs329x_hw2_rubric_rm",
         dataset_builder=dataset,
         learning_rate=learning_rate,
         lr_schedule="linear",
@@ -93,14 +97,14 @@ def build_config(
 
 
 def main(
-    model_name: str = "Qwen/Qwen3-30B-A3B-Instruct-2507",
+    model_name: str = "thinkingmachines/Inkling-Small",
     log_path: str = "results/prometheus_v2_preference_rm",
     max_length: int = 32768,
     learning_rate: float = 1e-4,
     batch_size: int = 512,
     eval_every: int = 200,
     wandb_project: str = "tinker_personalization",
-    wandb_name: str = "prometheus_v2_preference_rm_qwen3_30b_a3b",
+    wandb_name: str = "prometheus_v2_preference_rm_inkling_small",
 ):
     load_dotenv()
     config = build_config(
@@ -114,7 +118,7 @@ def main(
         wandb_name=wandb_name,
     )
     cli_utils.check_log_dir(config.log_path, behavior_if_exists="ask")
-    train.main(config)
+    asyncio.run(train.main(config))
 
 
 if __name__ == "__main__":

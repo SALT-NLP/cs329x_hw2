@@ -59,7 +59,7 @@ class PrometheusEvalComparisonRenderer:
 
     def to_tokens_weights(
         self, labeled_comparison: LabeledPrometheusEvalComparison
-    ) -> tuple[torch.Tensor, torch.Tensor]:
+    ) -> tuple[types.ModelInput, torch.Tensor]:
         raise NotImplementedError
 
     @property
@@ -106,8 +106,8 @@ An instruction (might include an Input inside it), two responses to evaluate (de
                 instruction += f"{msg['role']}: {msg['content']}\n"
         comparison_prompt = comparison_prompt_template.format(
             instruction=instruction,
-            completion_A=comparison.completion_A[0]["content"],
-            completion_B=comparison.completion_B[0]["content"],
+            completion_A=renderers.get_text_content(comparison.completion_A[0]),
+            completion_B=renderers.get_text_content(comparison.completion_B[0]),
             reference=comparison.reference if comparison.reference else "None",
             rubric=comparison.rubric,
         )
@@ -118,13 +118,13 @@ An instruction (might include an Input inside it), two responses to evaluate (de
 
     def to_tokens_weights(
         self, labeled_comparison: LabeledPrometheusEvalComparison
-    ) -> tuple[torch.Tensor, torch.Tensor]:
+    ) -> tuple[types.ModelInput, torch.Tensor]:
         convo = self._comparison_to_convo(labeled_comparison.comparison)
         convo_with_pref = convo + [{"role": "assistant", "content": labeled_comparison.label}]
-        tokens, weights = self.convo_renderer.build_supervised_example(
+        model_input, weights = self.convo_renderer.build_supervised_example(
             convo_with_pref, train_on_what=TrainOnWhat.ALL_ASSISTANT_MESSAGES
         )
-        return tokens, weights
+        return model_input, weights
 
     @property
     def tokenizer(self) -> Tokenizer:
@@ -147,7 +147,8 @@ class PrometheusEvalPreferenceModelFromChatRenderer(PrometheusEvalPreferenceMode
                 stop=self.comparison_renderer.convo_renderer.get_stop_sequences(),
             ),
         )
-        str_output = self.comparison_renderer.tokenizer.decode(response.sequences[0].tokens).strip()
+        message, _termination = self.comparison_renderer.convo_renderer.parse_response(response.sequences[0].tokens)
+        str_output = renderers.get_text_content(message).strip()
         # Expected output format: "{feedback} [RESULT] (Either "A" or "B")"
         if "[RESULT]" not in str_output:
             logger.warning(f"Invalid output preference model output: '{str_output}'")

@@ -1,9 +1,9 @@
 # CS329X HW2: Deep Personalization with Tinker
 
-**Due: Thursday, Oct 30, 2025 at 11:59 PM PT**
+**Due: Wednesday, Oct 28, 2026 at 11:59 PM PT**
 
-* Students taking CS329X for **3-units**: 100 points total + 20 points extra credit
-* Students taking CS329X for **4-units**: 120 points total + 20 points extra credit
+**Total: 100 points**
+
 
 ## Overview
 
@@ -13,13 +13,13 @@ In this assignment, you will experiment with four different approaches to person
 3. **Reinforcement Learning from AI Feedback (RLAIF)** - Using a reward model to optimize for personalized rubric
 4. **Experimenting with [Demonstration-Iterated Task Optimization (DITTO)](https://arxiv.org/pdf/2406.00888)** - Efficiently generating online comparison data
 
-> Note: Part 4, **Experimenting with DITTO**, is optional for students taking 3-units and mandatory for students taking 4-units.
-
-We also set one bonus:
-* Coming up with your own task rather than the default (i.e., email generation). (20 points)
-
+If you want to let the model to generate other text you produce not limiting to the email, you are very well encouraged to experiment that!
 
 You will use **Tinker**, the cutting-edge training API developed by Thinking Machine Labs, for this assignment. Tinker handles the heavy computation for forward and backward passes, allowing you to complete the assignment on your laptop despite the model training requirements.
+
+Follow the procedure to get the tinker access:
+1. Sign up for tinker at https://auth.thinkingmachines.ai/sign-up.
+2) Head to https://tinker.thinkingmachines.ai/billing/credit-grants to redeem the code we sent to you. (**Note:** Each enrolled student will get one code worth $250 credit. You can use it for HW2 and your project.)
 
 
 ## File Structure
@@ -40,13 +40,14 @@ You will use **Tinker**, the cutting-edge training API developed by Thinking Mac
 
 - **`rubric_preference_env.py`** - Environment setup and utilities for Prometheus-based evaluation
 - **`rubric_preference_types.py`** - Type definitions and data structures for Prometheus evaluation
+- **`inkling_renderer.py`** - Renderer helper that disables thinking for Inkling models (you DON'T need to change it)
 
 ## Environment Setup
 
 1. Install required packages (we suggest you install them in [Conda environment](https://docs.conda.io/projects/conda/en/stable/user-guide/install/index.html)):
    ```bash
    pip install tinker
-   pip install git+https://github.com/thinking-machines-lab/tinker-cookbook.git
+   pip install tinker_cookbook
    ```
 
 2. Copy `.env.example` to `.env` and fill in the API keys.

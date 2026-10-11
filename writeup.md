@@ -7,10 +7,9 @@
 
 ## Setup & Data Collection
 
-### Data Source Description (Bonus: 20 points)
-*If you're attempting the bonus by using a creative data source other than email generation, describe it here. Otherwise, write "Email generation (default task)".*
+### Data Source Description
 
-**TODO: Add your answer or leave it empty if you did not attempt the bonus**
+**TODO: Describe the data source you use for personalizing the model to your own writing style**
 
 ## Get Baseline Results (10 points total)
 
@@ -33,9 +32,11 @@ Copy-paste the system prompt you engineered to personalize the model outputs.
 
 ## Method 2: SFT with Synthetic Data (20 points total)
 
+Make sure you have synthesized the input prompts in `tinker_personalization.ipynb` (5 points).
+
 ### Launching SFT run
 
-**Add the wandb link for your run here (15 points):**
+Make sure you have completed `scripts/sft.py`. **Add the wandb link for your run here (10 points):**
 
 (Make sure you have set the project public. Check out [this post](https://community.wandb.ai/t/no-public-option-in-project-visibility-scope/7215/2) if have problem doing so.)
 
@@ -45,13 +46,13 @@ TODO: https://wandb.ai/.../runs/... (replace with your actual link)
 
 **TODO: Add your analysis here**
 
-## Method 3: Reinforcement Learning (RLAIF) (60 points in total)
+## Method 3: Reinforcement Learning (RLAIF) (40 points in total)
 
 ### Create a Reward Function using LLM-as-a-Judge
 
 #### Train the reward model
 
-Make sure you have complete `rubric_preference_env.py` (15 points).
+Make sure you have complete `rubric_preference_env.py` (5 points).
 
 Add the Tinker checkpoint of the reward model here (5 points):
 
@@ -67,7 +68,7 @@ Copy-paste your rubric. (5 points)
 
 ### Launching RL run
 
-**Add the wandb link for your run here (10 points):**
+Make sure you have completed the evaluator in `scripts/rl_with_rubric_rm.py`. **Add the wandb link for your run here (10 points):**
 
 (Make sure you have set the project public. Check out [this post](https://community.wandb.ai/t/no-public-option-in-project-visibility-scope/7215/2) if have problem doing so.)
 
@@ -83,7 +84,7 @@ Make sure your response covers:
 
 **TODO: Add your analysis here**
 
-## Extension: DITTO (20 points)
+## Method 4: DITTO (20 points in total)
 
 ### Implementation
 
@@ -91,13 +92,13 @@ Make sure your response covers:
 
 ### Launching DITTO run
 
-**Add the wandb link for your run here (10 points):**
+Make sure you have completed `scripts/ditto_dpo.py`. **Add the wandb link for your run here (10 points):**
 
 (Make sure you have set the project public. Check out [this post](https://community.wandb.ai/t/no-public-option-in-project-visibility-scope/7215/2) if have problem doing so.)
 
 TODO: https://wandb.ai/.../runs/... (replace with your actual link)
 
 
-### Analyze the Pros & Cons of Personalization with DITTO.
+### Analyze the Pros & Cons of Personalization with DITTO. (10 points)
 
 **TODO: Add your analysis here**

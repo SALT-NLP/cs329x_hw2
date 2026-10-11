@@ -8,7 +8,7 @@ import tinker
 from tinker_cookbook import renderers
 from tinker_cookbook.completers import TinkerMessageCompleter
 from tinker_cookbook.eval.evaluators import SamplingClientEvaluator
-from tinker_cookbook import cli_utils, model_info
+from tinker_cookbook import cli_utils
 from rubric_preference_env import (
     PrometheusEvalPreferenceModelFromChatRenderer,
     PrometheusEvalComparison,
@@ -17,6 +17,7 @@ from rubric_preference_env import (
 )
 from tinker_cookbook.tokenizer_utils import get_tokenizer
 from tinker_cookbook.rl import train
+from inkling_renderer import get_renderer_name
 
 
 
@@ -127,7 +128,7 @@ def build_config(
     wandb_project: str | None = None,
     wandb_name: str | None = None,
 ) -> train.Config:
-    renderer_name = model_info.get_recommended_renderer_name(model_name)
+    renderer_name = get_renderer_name(model_name)  # disables thinking for Inkling
     comparison_dataset_builder = PrometheusEvalDatasetBuilderFromJSONL(
         model_name_for_tokenizer=model_name,
         renderer_name=renderer_name,
@@ -137,7 +138,7 @@ def build_config(
     builder = PrometheusEvalPairwisePreferenceRLDatasetBuilder(
         comparison_dataset_builder=comparison_dataset_builder,
         batch_size=batch_size,
-        rm_renderer_name=model_info.get_recommended_renderer_name(reward_model_name),
+        rm_renderer_name=get_renderer_name(reward_model_name),
         rm_model_name_for_tokenizer=reward_model_name,
         rm_model_path=reward_model_path,
         group_size=group_size,
@@ -148,7 +149,7 @@ def build_config(
             comparison_dataset_builder=comparison_dataset_builder,
             policy_renderer_name=renderer_name,
             policy_tokenizer_model_name=model_name,
-            reward_renderer_name=model_info.get_recommended_renderer_name(reward_model_name),
+            reward_renderer_name=get_renderer_name(reward_model_name),
             reward_tokenizer_model_name=reward_model_name,
             reward_model_path=reward_model_path,
             base_model_name=model_name,
@@ -169,8 +170,8 @@ def build_config(
 
 
 def main(
-    model_name: str = "Qwen/Qwen3-4B-Instruct-2507",
-    reward_model_name: str = "Qwen/Qwen3-30B-A3B-Instruct-2507",
+    model_name: str = "thinkingmachines/Inkling-Small",
+    reward_model_name: str = "thinkingmachines/Inkling-Small",
     reward_model_path: str = "tinker://",  # TODO: add your model path here
     train_data_path: str = "results/rl_train_data.jsonl",
     test_data_path: str = "results/rl_dev_data.jsonl",
@@ -181,7 +182,7 @@ def main(
     group_size: int = 4,
     eval_every: int = 5,
     wandb_project: str = "tinker_personalization",
-    wandb_name: str = "rl_with_rubric_rm_qwen3_4b",
+    wandb_name: str = "rl_with_rubric_rm_inkling_small",
 ):
     load_dotenv()
     config = build_config(
